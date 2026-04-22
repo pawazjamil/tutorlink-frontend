@@ -1,3 +1,19 @@
+// ========== API CONFIGURATION ==========
+const API_URL = "https://tutorlink-backend-d1oa.onrender.com/api";
+
+// ========== GLOBAL VARIABLES ==========
+let tutors = [];
+let users = [];
+let messages = [];
+let bookings = [];
+let currentUser = null;
+let currentTutor = null;
+let currentBookingTutor = null;
+let selectedRating = 0;
+let selectedUserEmail = null;
+let selectedUserName = null;
+let chatInterval = null;
+
 // ========== INITIALIZE DATA ==========
 function initData() {
   if (localStorage.getItem("users")) {
@@ -787,7 +803,6 @@ function displayTutors(tutorsArray) {
     .join("");
 }
 
-// FIXED: Search function
 function searchTutors() {
   const subjectInput = document.getElementById("searchSubject").value.trim();
   const locationInput = document.getElementById("searchLocation").value.trim();
@@ -820,7 +835,6 @@ function searchTutors() {
   document.getElementById("becomeTutorSection").style.display = "none";
 }
 
-// FIXED: Filter by subject from quick buttons
 function filterSubject(subject) {
   document.getElementById("searchSubject").value = subject;
   const filtered = tutors.filter((t) => t.subject === subject);
@@ -834,7 +848,6 @@ function filterSubject(subject) {
   document.getElementById("becomeTutorSection").style.display = "none";
 }
 
-// Filter by subject from dropdown
 function filterBySubject() {
   const subject = document.getElementById("filterSubject").value;
   if (subject && subject !== "") {
