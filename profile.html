@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - TutorLink Bangladesh</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="nav-luxury">
+        <div class="nav-container">
+            <div class="logo-luxury">
+                <i class="fas fa-feather-alt"></i>
+                <span>TutorLink <span class="gold">Bangladesh</span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#tutors">Find Tutors</a></li>
+                <li><a href="messages.html">Messages</a></li>
+                <li><a href="profile.html" class="active">Profile</a></li>
+            </ul>
+            <div class="nav-auth" id="authButtons">
+                <button class="btn-login" onclick="showModal('loginModal')">Sign In</button>
+                <button class="btn-register" onclick="showModal('registerModal')">Join Now</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="profile-section">
+        <div class="profile-container luxury-glass">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h2 id="profileName">Loading...</h2>
+                <p id="profileEmail">Loading...</p>
+                
+                <!-- Edit Profile Button -->
+                <button class="btn-edit-profile" onclick="openEditProfileModal()">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+                
+                <!-- Account Management Buttons -->
+                <div class="profile-danger-zone">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Account Management</h4>
+                    <div class="danger-buttons">
+                        <button class="btn-deactivate" onclick="deactivateProfile()">
+                            <i class="fas fa-pause-circle"></i> Deactivate Account
+                        </button>
+                        <button class="btn-delete" onclick="confirmDeleteProfile()">
+                            <i class="fas fa-trash-alt"></i> Delete Account
+                        </button>
+                    </div>
+                    <p class="danger-note">
+                        <i class="fas fa-info-circle"></i> 
+                        Deactivating hides your profile temporarily. You can reactivate by logging in.<br>
+                        Deleting is PERMANENT and cannot be undone.
+                    </p>
+                </div>
+            </div>
+
+            <div class="profile-info" id="profileView">
+                <div class="info-card">
+                    <h3><i class="fas fa-user"></i> Personal Information</h3>
+                    <div class="info-row">
+                        <span class="info-label">Full Name:</span>
+                        <span class="info-value" id="viewName">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" id="viewEmail">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Phone:</span>
+                        <span class="info-value" id="viewPhone">Not added</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Location:</span>
+                        <span class="info-value" id="viewLocation">Not added</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Member Since:</span>
+                        <span class="info-value" id="viewJoined">2026</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-chart-line"></i> Statistics</h3>
+                    <div class="info-row">
+                        <span class="info-label">Total Bookings:</span>
+                        <span class="info-value" id="viewBookings">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Messages Sent:</span>
+                        <span class="info-value" id="viewMessages">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Account Type:</span>
+                        <span class="info-value" id="viewType">Student</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-edit" id="profileEdit" style="display: none;">
+                <h3>Edit Your Profile</h3>
+                <form id="editProfileForm" onsubmit="event.preventDefault(); saveProfileChanges()">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Full Name</label>
+                            <input type="text" id="editName" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" id="editEmail" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-phone"></i> Phone Number</label>
+                            <input type="tel" id="editPhone" placeholder="017xxxxxxxx">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> Location</label>
+                            <input type="text" id="editLocation" placeholder="Dhanmondi, Dhaka">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-edit-profile">Save Changes</button>
+                        <button type="button" class="btn-profile" onclick="toggleEditMode()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bookings-history">
+                <h3><i class="fas fa-calendar-check"></i> My Bookings</h3>
+                <div id="bookingsList" class="bookings-list">
+                    <!-- Bookings will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-container">
+            <span class="modal-close" onclick="closeModal('editProfileModal')">&times;</span>
+            <div class="modal-icon">✏️</div>
+            <h2>Edit Profile</h2>
+            <form id="editProfileFormModal" onsubmit="event.preventDefault(); saveProfileChanges()">
+                <div style="text-align:center; margin-bottom:1rem;">
+                    <div id="profilePicPreview" style="width:100px; height:100px; border-radius:50%; margin:0 auto 1rem; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:3rem; overflow:hidden;">
+                        👤
+                    </div>
+                    <input type="file" id="profilePicUpload" accept="image/*" style="display:none;" onchange="previewProfilePicture(event)">
+                    <button type="button" class="btn-profile" onclick="document.getElementById('profilePicUpload').click()" style="font-size:0.8rem;">Choose Photo</button>
+                </div>
+                
+                <input type="text" id="editNameModal" placeholder="Full Name" required>
+                <input type="email" id="editEmailModal" placeholder="Email" required>
+                <input type="tel" id="editPhoneModal" placeholder="Phone Number">
+                <input type="text" id="editLocationModal" placeholder="Location">
+                <button type="submit" class="modal-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-container">
+            <span class="modal-close" onclick="closeModal('loginModal')">&times;</span>
+            <div class="modal-icon">🔑</div>
+            <h2>Welcome Back</h2>
+            <form onsubmit="event.preventDefault(); login()">
+                <input type="email" id="loginEmail" placeholder="Email address" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <button type="submit" class="modal-btn">Sign In</button>
+                <p class="modal-footer">New here? <a href="#" onclick="switchModal('registerModal')">Create account</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-container">
+            <span class="modal-close" onclick="closeModal('registerModal')">&times;</span>
+            <div class="modal-icon">✨</div>
+            <h2>Join the Community</h2>
+            <form onsubmit="event.preventDefault(); register()">
+                <input type="text" id="regName" placeholder="Full name" required>
+                <input type="email" id="regEmail" placeholder="Email address" required>
+                <input type="password" id="regPassword" placeholder="Password" required>
+                <select id="regType">
+                    <option value="student">I'm a Student</option>
+                    <option value="tutor">I'm a Tutor</option>
+                </select>
+                <button type="submit" class="modal-btn">Join Now</button>
+                <p class="modal-footer">Already a member? <a href="#" onclick="switchModal('loginModal')">Sign In</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        
+        function toggleEditMode() {
+            const viewDiv = document.getElementById('profileView');
+            const editDiv = document.getElementById('profileEdit');
+            const isEditing = editDiv.style.display === 'block';
+            
+            if (isEditing) {
+                viewDiv.style.display = 'block';
+                editDiv.style.display = 'none';
+                loadProfileData();
+            } else {
+                document.getElementById('editName').value = currentUser?.name || '';
+                document.getElementById('editEmail').value = currentUser?.email || '';
+                document.getElementById('editPhone').value = currentUser?.phone || '';
+                document.getElementById('editLocation').value = currentUser?.location || '';
+                viewDiv.style.display = 'none';
+                editDiv.style.display = 'block';
+            }
+        }
+
+        function openEditProfileModal() {
+            document.getElementById('editNameModal').value = currentUser?.name || '';
+            document.getElementById('editEmailModal').value = currentUser?.email || '';
+            document.getElementById('editPhoneModal').value = currentUser?.phone || '';
+            document.getElementById('editLocationModal').value = currentUser?.location || '';
+            showModal('editProfileModal');
+        }
+
+        function saveProfileChanges() {
+            if (!currentUser) return;
+            
+            currentUser.name = document.getElementById('editNameModal').value;
+            currentUser.email = document.getElementById('editEmailModal').value;
+            currentUser.phone = document.getElementById('editPhoneModal').value;
+            currentUser.location = document.getElementById('editLocationModal').value;
+            
+            const fileInput = document.getElementById('profilePicUpload');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentUser.profilePic = e.target.result;
+                    finalizeProfileSave();
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                finalizeProfileSave();
+            }
+        }
+
+        function finalizeProfileSave() {
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            const userIndex = users.findIndex(u => u.email === currentUser.email);
+            if (userIndex !== -1) users[userIndex] = currentUser;
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            let tutors = JSON.parse(localStorage.getItem('tutors')) || [];
+            const tutorIndex = tutors.findIndex(t => t.email === currentUser.email);
+            if (tutorIndex !== -1) {
+                tutors[tutorIndex].name = currentUser.name;
+                tutors[tutorIndex].email = currentUser.email;
+                if (currentUser.profilePic) tutors[tutorIndex].profilePic = currentUser.profilePic;
+                localStorage.setItem('tutors', JSON.stringify(tutors));
+            }
+            
+            showToast('Profile updated!');
+            closeModal('editProfileModal');
+            updateAuthUI();
+            loadProfileData();
+        }
+
+        function previewProfilePicture(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('profilePicPreview');
+                    preview.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function loadProfileData() {
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            document.getElementById('profileName').textContent = currentUser.name;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('viewName').textContent = currentUser.name;
+            document.getElementById('viewEmail').textContent = currentUser.email;
+            document.getElementById('viewPhone').textContent = currentUser.phone || 'Not added';
+            document.getElementById('viewLocation').textContent = currentUser.location || 'Not added';
+            document.getElementById('viewType').textContent = currentUser.type === 'tutor' ? 'Tutor' : 'Student';
+            document.getElementById('viewJoined').textContent = currentUser.joined || '2026';
+            
+            const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            const myBookings = bookings.filter(b => b.studentName === currentUser.name);
+            document.getElementById('viewBookings').textContent = myBookings.length;
+            
+            const messages = JSON.parse(localStorage.getItem('messages')) || [];
+            const myMessages = messages.filter(m => m.from === currentUser.email || m.to === currentUser.email);
+            document.getElementById('viewMessages').textContent = myMessages.length;
+            
+            const bookingsDiv = document.getElementById('bookingsList');
+            if (myBookings.length === 0) {
+                bookingsDiv.innerHTML = '<p class="no-data">No bookings yet. Start by finding a tutor!</p>';
+            } else {
+                bookingsDiv.innerHTML = myBookings.map(b => `
+                    <div class="booking-card">
+                        <div class="booking-info">
+                            <strong>${b.tutor}</strong> - ${b.subject}
+                            <br><small>${b.days} days/week</small>
+                        </div>
+                        <div class="booking-status">${b.status || 'Confirmed'}</div>
+                        <div class="booking-fee">৳${b.total}/month</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateAuthUI() {
+            const container = document.getElementById('authButtons');
+            if (currentUser) {
+                container.innerHTML = `<span style="color:#C6A43F; margin-right:1rem;">${currentUser.name}</span><button class="btn-login" onclick="logout()">Sign Out</button>`;
+            } else {
+                container.innerHTML = `<button class="btn-login" onclick="showModal('loginModal')">Sign In</button><button class="btn-register" onclick="showModal('registerModal')">Join Now</button>`;
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            showToast('Logged out successfully');
+            updateAuthUI();
+            window.location.href = 'index.html';
+        }
+
+        // ========== DEACTIVATE & DELETE ACCOUNT FUNCTIONS ==========
+        function deactivateProfile() {
+            if (!currentUser) {
+                showToast('Please login first');
+                return;
+            }
+            if (confirm('Are you sure you want to DEACTIVATE your account?\n\nYou can reactivate anytime by logging in.')) {
+                // Update user status in users array
+                let users = JSON.parse(localStorage.getItem('users')) || [];
+                const userIndex = users.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    users[userIndex].status = 'deactivated';
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+                // Update tutors array if user is a tutor
+                let tutors = JSON.parse(localStorage.getItem('tutors')) || [];
+                const tutorIndex = tutors.findIndex(t => t.email === currentUser.email);
+                if (tutorIndex !== -1) {
+                    tutors[tutorIndex].status = 'deactivated';
+                    localStorage.setItem('tutors', JSON.stringify(tutors));
+                }
+                currentUser.status = 'deactivated';
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showToast('Your account has been deactivated.');
+                // Logout after 2 seconds
+                setTimeout(() => {
+                    logout();
+                }, 2000);
+            }
+        }
+
+        function confirmDeleteProfile() {
+            if (!currentUser) {
+                showToast('Please login first');
+                return;
+            }
+            if (confirm('⚠️ PERMANENT ACTION ⚠️\n\nAre you sure you want to DELETE your account?\n\nThis action is PERMANENT and cannot be undone.\n\nAll your data will be lost.\n\nClick OK to continue.')) {
+                const confirmation = prompt('Type "DELETE" to permanently delete your account:');
+                if (confirmation === 'DELETE') {
+                    deleteAccountPermanently();
+                } else {
+                    showToast('Account deletion cancelled');
+                }
+            }
+        }
+
+        function deleteAccountPermanently() {
+            const userEmail = currentUser.email;
+            // Remove from users array
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            if (userIndex !== -1) users.splice(userIndex, 1);
+            localStorage.setItem('users', JSON.stringify(users));
+            // Remove from tutors array if user was a tutor
+            let tutors = JSON.parse(localStorage.getItem('tutors')) || [];
+            const tutorIndex = tutors.findIndex(t => t.email === userEmail);
+            if (tutorIndex !== -1) {
+                tutors.splice(tutorIndex, 1);
+                localStorage.setItem('tutors', JSON.stringify(tutors));
+            }
+            // Remove all messages and bookings related to this user
+            let messages = JSON.parse(localStorage.getItem('messages')) || [];
+            messages = messages.filter(m => m.from !== userEmail && m.to !== userEmail);
+            localStorage.setItem('messages', JSON.stringify(messages));
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            bookings = bookings.filter(b => b.studentEmail !== userEmail && b.tutorEmail !== userEmail);
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+            showToast('Your account has been permanently deleted.');
+            logout();
+        }
+
+        function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function switchModal(id) { closeAllModals(); showModal(id); }
+        function closeAllModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+        
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+            updateAuthUI();
+            loadProfileData();
+        });
+    </script>
+</body>
+</html>

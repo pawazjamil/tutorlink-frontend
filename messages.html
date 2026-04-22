@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - TutorLink Bangladesh</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar glass">
+        <div class="logo">
+            <i class="fas fa-crown"></i>
+            <span>TutorLink <span class="gold-text">Bangladesh</span></span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#tutors">Find Tutors</a></li>
+            <li><a href="messages.html" class="active">Messages</a></li>
+            <li><a href="profile.html">Profile</a></li>
+        </ul>
+        <div class="auth-buttons" id="authButtons"></div>
+    </nav>
+
+    <section class="messages-section">
+        <div class="messages-container glass">
+            <div class="messages-header">
+                <h2><i class="fas fa-envelope"></i> Messages</h2>
+                <button class="btn-new-message" onclick="showNewMessageModal()">
+                    <i class="fas fa-plus"></i> New Message
+                </button>
+            </div>
+            
+            <div class="conversations-list" id="conversationsList">
+                <!-- Conversations will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- New Message Modal -->
+    <div id="newMessageModal" class="modal premium-modal">
+        <div class="modal-content glass">
+            <span class="close" onclick="closeModal('newMessageModal')">&times;</span>
+            <div class="modal-icon"><i class="fas fa-paper-plane"></i></div>
+            <h2>Send New Message</h2>
+            <form id="newMessageForm" onsubmit="event.preventDefault(); sendNewMessage()">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> To (Tutor Name)</label>
+                    <input type="text" id="messageTo" placeholder="Enter tutor name" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-comment"></i> Message</label>
+                    <textarea id="messageContent" rows="5" placeholder="Type your message here..." required></textarea>
+                </div>
+                <button type="submit" class="btn-gold btn-full">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/tutors.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        function loadConversations() {
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            const messages = JSON.parse(localStorage.getItem('messages')) || [];
+            const myMessages = messages.filter(m => m.from === currentUser.email || m.to === currentUser.email);
+            
+            const conversations = new Map();
+            myMessages.forEach(msg => {
+                const other = msg.from === currentUser.email ? msg.to : msg.from;
+                if (!conversations.has(other)) {
+                    const tutor = tutors.find(t => t.email === other);
+                    conversations.set(other, {
+                        email: other,
+                        name: tutor?.name || other.split('@')[0],
+                        lastMessage: msg.content,
+                        lastTime: msg.timestamp,
+                        unread: !msg.read && msg.to === currentUser.email
+                    });
+                }
+            });
+            
+            const container = document.getElementById('conversationsList');
+            if (conversations.size === 0) {
+                container.innerHTML = '<div class="no-conversations"><i class="fas fa-inbox"></i><h3>No messages yet</h3><p>Start a conversation with a tutor!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = Array.from(conversations.values()).map(conv => `
+                <div class="conversation-card" onclick="openChat('${conv.email}', '${conv.name}')">
+                    <div class="conv-avatar">
+                        <i class="fas fa-user-circle"></i>
+                        ${conv.unread ? '<span class="unread-badge"></span>' : ''}
+                    </div>
+                    <div class="conv-info">
+                        <h4>${conv.name}</h4>
+                        <p>${conv.lastMessage.substring(0, 50)}...</p>
+                    </div>
+                    <div class="conv-time">
+                        <small>${new Date(conv.lastTime).toLocaleDateString()}</small>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showNewMessageModal() {
+            showModal('newMessageModal');
+        }
+
+        function sendNewMessage() {
+            const toName = document.getElementById('messageTo').value;
+            const content = document.getElementById('messageContent').value;
+            
+            const tutor = tutors.find(t => t.name.toLowerCase() === toName.toLowerCase());
+            if (!tutor) {
+                showToast('Tutor not found!', 'error');
+                return;
+            }
+            
+            const messages = JSON.parse(localStorage.getItem('messages')) || [];
+            messages.push({
+                id: Date.now(),
+                from: currentUser.email,
+                fromName: currentUser.name,
+                to: tutor.email,
+                toName: tutor.name,
+                content: content,
+                timestamp: new Date().toISOString(),
+                read: false
+            });
+            
+            localStorage.setItem('messages', JSON.stringify(messages));
+            showToast('Message sent successfully!', 'success');
+            closeModal('newMessageModal');
+            loadConversations();
+            document.getElementById('newMessageForm').reset();
+        }
+
+        function openChat(email, name) {
+            window.location.href = `chat.html?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+            updateAuthUI();
+            loadConversations();
+        });
+    </script>
+</body>
+</html>
