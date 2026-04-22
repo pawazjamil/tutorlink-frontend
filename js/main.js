@@ -381,9 +381,7 @@ function filterUserList() {
   populateUserList(searchTerm);
 }
 
-let selectedUserEmail = null;
-let selectedUserName = null;
-
+// No duplicate declarations here – they are already at the top
 function selectUser(email, name) {
   selectedUserEmail = email;
   selectedUserName = name;
