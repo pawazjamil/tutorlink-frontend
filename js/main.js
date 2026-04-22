@@ -5,7 +5,7 @@ let messages = [];
 let bookings = [];
 let currentUser = null;
 
-// ========== INITIALIZE DATA ==========
+// ========== INITIALIZE DATA (localStorage) ==========
 function initData() {
   if (localStorage.getItem("users")) {
     users = JSON.parse(localStorage.getItem("users"));
@@ -21,11 +21,11 @@ function initData() {
     tutors = JSON.parse(localStorage.getItem("tutors"));
   } else {
     tutors = [
-      { id: 1, name: "Dr. Abdur Rahman", email: "rahman@tutor.com", password: "tutor123", type: "tutor", phone: "01711111111", subject: "Math", baseRate: 3500, perDayRate: 600, location: "Dhanmondi", qualification: "PhD in Mathematics, DU", experience: 12, bio: "Award-winning mathematician with 12+ years of teaching excellence.", avatar: "👨‍🏫", rating: 4.9, totalRatings: 128, reviews: [], profilePic: null },
-      { id: 2, name: "Prof. Fatema Begum", email: "fatema@tutor.com", password: "tutor123", type: "tutor", phone: "01822222222", subject: "English", baseRate: 4000, perDayRate: 700, location: "Gulshan", qualification: "PhD in English, Oxford", experience: 15, bio: "Oxford-educated professor specializing in IELTS.", avatar: "👩‍🏫", rating: 4.95, totalRatings: 245, reviews: [], profilePic: null },
-      { id: 3, name: "Dr. Hasan Mahmud", email: "hasan@tutor.com", password: "tutor123", type: "tutor", phone: "01933333333", subject: "Physics", baseRate: 3800, perDayRate: 650, location: "Uttara", qualification: "M.Sc in Physics, BUET", experience: 10, bio: "Physics expert making complex concepts simple.", avatar: "👨‍🔬", rating: 4.7, totalRatings: 89, reviews: [], profilePic: null },
-      { id: 4, name: "Prof. Kamal Hossain", email: "kamal@tutor.com", password: "tutor123", type: "tutor", phone: "01644444444", subject: "Chemistry", baseRate: 3600, perDayRate: 600, location: "Mohammadpur", qualification: "M.Sc in Chemistry, DU", experience: 8, bio: "Chemistry specialist with passion for teaching.", avatar: "🧪", rating: 4.6, totalRatings: 67, reviews: [], profilePic: null },
-      { id: 5, name: "Ms. Jahanara Akter", email: "jahanara@tutor.com", password: "tutor123", type: "tutor", phone: "01555555555", subject: "Programming", baseRate: 5000, perDayRate: 800, location: "Banani", qualification: "B.Sc in CSE, BUET", experience: 6, bio: "Senior Software Engineer at Google.", avatar: "💻", rating: 4.98, totalRatings: 156, reviews: [], profilePic: null },
+      { id: 1, name: "Dr. Abdur Rahman", email: "rahman@tutor.com", password: "tutor123", type: "tutor", phone: "01711111111", subject: "Math", baseRate: 3500, perDayRate: 600, location: "Dhanmondi", qualification: "PhD in Mathematics, DU", experience: 12, bio: "Award-winning mathematician.", avatar: "👨‍🏫", rating: 4.9, totalRatings: 128, reviews: [], profilePic: null },
+      { id: 2, name: "Prof. Fatema Begum", email: "fatema@tutor.com", password: "tutor123", type: "tutor", phone: "01822222222", subject: "English", baseRate: 4000, perDayRate: 700, location: "Gulshan", qualification: "PhD in English, Oxford", experience: 15, bio: "Oxford-educated professor.", avatar: "👩‍🏫", rating: 4.95, totalRatings: 245, reviews: [], profilePic: null },
+      { id: 3, name: "Dr. Hasan Mahmud", email: "hasan@tutor.com", password: "tutor123", type: "tutor", phone: "01933333333", subject: "Physics", baseRate: 3800, perDayRate: 650, location: "Uttara", qualification: "M.Sc in Physics, BUET", experience: 10, bio: "Physics expert.", avatar: "👨‍🔬", rating: 4.7, totalRatings: 89, reviews: [], profilePic: null },
+      { id: 4, name: "Prof. Kamal Hossain", email: "kamal@tutor.com", password: "tutor123", type: "tutor", phone: "01644444444", subject: "Chemistry", baseRate: 3600, perDayRate: 600, location: "Mohammadpur", qualification: "M.Sc in Chemistry, DU", experience: 8, bio: "Chemistry specialist.", avatar: "🧪", rating: 4.6, totalRatings: 67, reviews: [], profilePic: null },
+      { id: 5, name: "Ms. Jahanara Akter", email: "jahanara@tutor.com", password: "tutor123", type: "tutor", phone: "01555555555", subject: "Programming", baseRate: 5000, perDayRate: 800, location: "Banani", qualification: "B.Sc in CSE, BUET", experience: 6, bio: "Software Engineer.", avatar: "💻", rating: 4.98, totalRatings: 156, reviews: [], profilePic: null },
     ];
     localStorage.setItem("tutors", JSON.stringify(tutors));
   }
@@ -60,7 +60,7 @@ function getStars(rating) {
   return stars;
 }
 
-// ========== NAVIGATION ==========
+// ========== NAVIGATION (ALL required functions) ==========
 function showHome() {
   document.getElementById("homeSection").style.display = "flex";
   document.getElementById("tutorsSection").style.display = "none";
@@ -110,6 +110,21 @@ function showBecomeTutor() {
   document.getElementById("profileSection").style.display = "none";
   document.getElementById("messagesSection").style.display = "none";
   document.getElementById("becomeTutorSection").style.display = "block";
+}
+
+// ========== MODAL FUNCTIONS (required by HTML) ==========
+function showModal(id) {
+  document.getElementById(id).style.display = "flex";
+}
+function closeModal(id) {
+  document.getElementById(id).style.display = "none";
+}
+function switchModal(id) {
+  closeAllModals();
+  showModal(id);
+}
+function closeAllModals() {
+  document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
 }
 
 // ========== PROFILE ==========
@@ -180,7 +195,7 @@ function displayTutors(tutorsArray) {
         <div class="tutor-actions">
           <button class="btn-profile" onclick="viewTutor(${t.id})">View Profile</button>
           <button class="btn-book" onclick="openBooking(${t.id})">Book Now</button>
-          <button class="btn-profile" onclick="alert('Message to ${t.name}')">Message</button>
+          <button class="btn-profile" onclick="openChatWithTutor('${t.name}', '${t.email}')">Message</button>
         </div>
       </div>
     </div>
@@ -229,46 +244,68 @@ function sortTutors() {
 function viewTutor(id) {
   const t = tutors.find(t => t.id === id);
   if (!t) return;
-  alert(`Viewing ${t.name}\nSubject: ${t.subject}\nRate: ৳${t.baseRate}/month`);
-  // You can expand this to a modal later
+  alert(`📚 ${t.name}\nSubject: ${t.subject}\n📍 ${t.location}\n💰 Monthly: ৳${t.baseRate} (4 days)\n⭐ Rating: ${t.rating} (${t.totalRatings} reviews)\n🎓 ${t.qualification}\n📝 ${t.bio}`);
 }
 
 function openBooking(id) {
   if (!currentUser) { showToast("Please login first"); showModal("loginModal"); return; }
-  if (currentUser.type === "tutor") { showToast("Tutors cannot book."); return; }
+  if (currentUser.type === "tutor") { showToast("Tutors cannot book. Please login as student."); return; }
   const t = tutors.find(t => t.id === id);
   if (!t) return;
-  const days = prompt("Enter days per week (4,5,6):", "4");
+  const days = prompt("📅 How many days per week? (4,5,6):", "4");
   if (!days) return;
-  const total = t.baseRate + (parseInt(days)-4)*t.perDayRate;
-  if (confirm(`Book ${t.name} for ${days} days/week at ৳${total}/month?`)) {
+  const daysNum = parseInt(days);
+  if (daysNum < 4 || daysNum > 6) { showToast("Please enter 4, 5, or 6"); return; }
+  const total = t.baseRate + (daysNum - 4) * t.perDayRate;
+  if (confirm(`Confirm booking for ${t.name}?\n${daysNum} days/week\nTotal: ৳${total}/month`)) {
     bookings.push({
       id: Date.now(),
       tutor: t.name,
       tutorEmail: t.email,
       subject: t.subject,
-      days: parseInt(days),
+      days: daysNum,
       total: total,
       date: new Date().toLocaleDateString(),
       studentName: currentUser.name,
       studentEmail: currentUser.email,
     });
     localStorage.setItem("bookings", JSON.stringify(bookings));
-    showToast(`Booked ${t.name} for ৳${total}/month`);
+    showToast(`✅ Booked ${t.name} for ৳${total}/month`);
+    // Optionally send a message (you can add later)
   }
 }
 
-// ========== MESSAGING (simplified) ==========
+// ========== MESSAGING ==========
+function openChatWithTutor(tutorName, tutorEmail) {
+  if (!currentUser) { showToast("Please login first"); showModal("loginModal"); return; }
+  showMessages();
+  // Simulate a conversation for now
+  document.getElementById("messagesContent").innerHTML = `
+    <div style="padding:1rem;">
+      <h3>Chat with ${tutorName}</h3>
+      <p>Messaging feature will be fully implemented soon.</p>
+      <textarea id="chatMsg" placeholder="Type your message..." rows="3" style="width:100%; margin:1rem 0;"></textarea>
+      <button onclick="alert('Message sent (demo)')">Send</button>
+    </div>
+  `;
+}
+
 function loadConversations() {
-  document.getElementById("messagesContent").innerHTML = `<p>Messaging will be available soon.</p>`;
+  document.getElementById("messagesContent").innerHTML = `
+    <div style="text-align:center; padding:2rem;">
+      <p>💬 You have no conversations yet.</p>
+      <p>Go to <strong>Find Tutors</strong> and click "Message" on any tutor to start a conversation.</p>
+    </div>
+  `;
+}
+
+// ========== BECOME A TUTOR ==========
+function applyAsTutor() {
+  if (!currentUser) { showToast("Please login first"); showModal("loginModal"); return; }
+  alert("Tutor registration will be available soon. For now, please use the existing tutor accounts.\nDemo tutor: rahman@tutor.com / tutor123");
 }
 
 // ========== AUTH ==========
-function showModal(id) { document.getElementById(id).style.display = "flex"; }
-function closeModal(id) { document.getElementById(id).style.display = "none"; }
-function switchModal(id) { closeAllModals(); showModal(id); }
-function closeAllModals() { document.querySelectorAll(".modal").forEach(m => m.style.display = "none"); }
-
 function login() {
   const email = document.getElementById("loginEmail").value;
   const pwd = document.getElementById("loginPassword").value;
@@ -291,12 +328,12 @@ function register() {
   const pwd = document.getElementById("regPassword").value;
   const type = document.getElementById("regType").value;
   if (!name || !email || !pwd) { showToast("Fill all fields"); return; }
-  if (users.find(u => u.email === email)) { showToast("Email exists"); return; }
+  if (users.find(u => u.email === email)) { showToast("Email already exists"); return; }
   const newUser = { id: users.length+1, name, email, password: pwd, type, joined: "2026", phone: "", location: "", profilePic: null };
   users.push(newUser);
   localStorage.setItem("users", JSON.stringify(users));
   if (type === "tutor") {
-    showToast("Please complete your tutor profile in Become a Tutor section");
+    showToast("Please complete your tutor profile in the Become a Tutor section");
     currentUser = newUser;
     localStorage.setItem("currentUser", JSON.stringify(currentUser));
     updateAuthUI();
@@ -323,15 +360,10 @@ function logout() {
 function updateAuthUI() {
   const container = document.getElementById("authButtons");
   if (currentUser) {
-    container.innerHTML = `<span style="color:#C6A43F;">${currentUser.name}</span><button class="btn-login" onclick="logout()">Sign Out</button>`;
+    container.innerHTML = `<span style="color:#C6A43F; margin-right:0.5rem;">${currentUser.name}</span><button class="btn-login" onclick="logout()">Sign Out</button>`;
   } else {
     container.innerHTML = `<button class="btn-login" onclick="showModal('loginModal')">Sign In</button><button class="btn-register" onclick="showModal('registerModal')">Join Now</button>`;
   }
-}
-
-// ========== BECOME A TUTOR (simplified) ==========
-function applyAsTutor() {
-  alert("Tutor registration will be implemented soon. For now, use existing tutor accounts.");
 }
 
 // ========== INITIALIZE ==========
